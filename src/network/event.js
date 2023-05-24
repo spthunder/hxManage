@@ -30,9 +30,9 @@ const urgentEvent = function(){
     method:"get"
   })
 }
-const eventSearch = function (id){
+const eventSearch = function (target){ //根据标题内容用户名
   return service({
-    url:"event/" + id,
+    url:"event/search/" + target,
     method:"get"
   })
 }

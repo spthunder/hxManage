@@ -8,7 +8,8 @@ const getNotifyList = function (){
 const addNotify = function (notify){
   return service({
     url:"notify",
-    method:"put"
+    method:"post",
+    params: notify
   })
 }
 const deleteNotify = function(id){
@@ -17,8 +18,15 @@ const deleteNotify = function(id){
     method:"delete"
   })
 }
+const notifySearch = function (target){ //根据标题内容
+  return service({
+    url:"notify/search/" + target,
+    method:"get"
+  })
+}
 export {
   getNotifyList,
   addNotify,
-  deleteNotify
+  deleteNotify,
+  notifySearch
 }

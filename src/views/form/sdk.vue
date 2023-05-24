@@ -1,12 +1,12 @@
 <template>
   <div class="app-container">
     <div style="margin-top: 15px;margin-bottom: 15px">
-      <el-input placeholder="请输入内容" v-model="input3" class="input-with-select">
+      <el-input placeholder="请输入标题内容或用户名" v-model="input3" class="input-with-select">
         <el-select v-model="select" slot="prepend" placeholder="请选择">
           <el-option label="id" value="1"></el-option>
           <el-option label="名称" value="2"></el-option>
         </el-select>
-        <el-button slot="append" icon="el-icon-search"></el-button>
+        <el-button @click="search" slot="append" icon="el-icon-search"></el-button>
       </el-input>
     </div>
     <div style="margin-bottom: 1rem">
@@ -120,8 +120,8 @@
 </template>
 
 <script>
-import {addUser, getUserList} from "@/network/user";
-import {getEventList,deleteEvent,addEvent} from "@/network/event";
+import {addUser, getUserList, userSearch} from "@/network/user";
+import {getEventList,deleteEvent,addEvent, eventSearch} from "@/network/event";
 import upload from "@/views/form/components/upload";
 export default {
   components:{
@@ -130,6 +130,7 @@ export default {
   data() {
     return {
       list:[],
+      input3:'',
       showAdd:false,
       form: {
         title: '',
@@ -145,8 +146,40 @@ export default {
       }
     }
   },
+  created() {
+    getEventList().then(res => {
+      this.list.push(...res.data)
+      console.log(this.list)
+    })
+  },
+  watch:{
+    input3:{
+      handler(newVal, oldVal){
+        console.log(newVal)
+        if(newVal === ''){
+          console.log("1111")
+          this.reload()
+          console.log("333")
+        }
+      },
+      immediate:true
+    }
+  },
   methods: {
+    search(){
+      console.log(this.input3 === '')
+      if(this.input3 === ''){
+        this.reload()
+      }else{
+        eventSearch(this.input3).then(res => {
+          this.list = []
+          this.list.push(...res.data)
+          console.log(this.list)
+        })
+      }
+      },
     reload(){
+      console.log("222")
       getEventList().then(res => {
         this.list = []
         this.list.push(...res.data)
@@ -196,13 +229,9 @@ export default {
         this.reload()
       })
     },
-  },
-  created() {
-    getEventList().then(res => {
-      this.list.push(...res.data)
-      console.log(this.list)
-    })
-  },
+    },
+
+
 
 }
 </script>

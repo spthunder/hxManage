@@ -45,7 +45,6 @@
 
       <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
-        <span>xxx</span>
       </div>
 
     </el-form>
@@ -54,6 +53,7 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
+import {login} from "@/network/admin";
 
 export default {
   name: 'Login',
@@ -74,8 +74,8 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '123456'
+        username: '',
+        password: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -109,12 +109,25 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
-            this.loading = false
-          }).catch(() => {
-            this.loading = false
+          login({
+            name: this.loginForm.username,
+            password: this.loginForm.password
+          }).then(res => {
+            console.log(res)
+            if(res.data.length > 0){
+              this.$store.dispatch('user/login', this.loginForm).then(() => {
+                this.$router.push({ path: this.redirect || '/' })
+                this.loading = false
+              }).catch(() => {
+                this.loading = false
+              })
+            }else{
+              this.loading = false
+              this.$message.error('用户名或密码错误');
+            }
+
           })
+
         } else {
           console.log('error submit!!')
           return false

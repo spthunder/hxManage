@@ -1,36 +1,25 @@
 <template>
   <div class="app-container">
       <div style="margin-top: 15px;margin-bottom: 15px">
-        <el-input placeholder="请输入内容" v-model="input3" class="input-with-select">
+        <el-input placeholder="请输入标题或内容" v-model="input3" class="input-with-select">
           <el-select v-model="select" slot="prepend" placeholder="请选择">
             <el-option label="id" value="1"></el-option>
             <el-option label="名称" value="2"></el-option>
           </el-select>
-          <el-button slot="append" icon="el-icon-search"></el-button>
+          <el-button @click="search" slot="append" icon="el-icon-search"></el-button>
         </el-input>
       </div>
     <div style="margin-bottom: 1rem">
       <el-button type="primary" size="small" @click="changeShowAdd">添加</el-button>
     </div>
     <el-form v-show="showAdd" style="width: 60%"  ref="form" :model="form" label-width="80px">
-      <el-form-item label="用户名称">
-        <el-input v-model="form.name"></el-input>
+      <el-form-item label="通知标题">
+        <el-input v-model="form.title"></el-input>
       </el-form-item>
-      <el-form-item label="用户密码">
-        <el-input v-model="form.password"></el-input>
+      <el-form-item label="通知">
+        <el-input type="textarea" v-model="form.content"></el-input>
       </el-form-item>
-      <el-form-item label="角色选择">
-        <el-select v-model="form.role" placeholder="请选择用户角色">
-          <el-option label="求助用户" value="0"></el-option>
-          <el-option label="帮扶用户" value="1"></el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="用户年龄">
-        <el-input v-model="form.age"></el-input>
-      </el-form-item>
-      <el-form-item label="用户头像">
-        <el-input v-model="form.img"></el-input>
-      </el-form-item>
+
       <el-form-item>
         <el-button type="primary" @click="onsubmit">立即创建</el-button>
         <el-button @click="changeShowAdd">取消</el-button>
@@ -90,30 +79,17 @@
 </template>
 
 <script>
-import {getNotifyList} from "@/network/notify";
+import {deleteNotify, addNotify, getNotifyList, notifySearch} from "@/network/notify";
+import {addEvent, eventSearch, getEventList} from "@/network/event";
 
 export default {
-  methods: {
-    handleClick(row) {
-      console.log(row);
-    },
-    changeShowAdd(){
-      this.showAdd = !this.showAdd
-    }
-  },
-
   data() {
     return {
       list:[],
       showAdd:false,
       form: {
-        name: '',
-        password:'',
-        role: '',
-        age:'',
-        img:'',
-        collectList:'0',
-        inProcess:'0',
+        title:'',
+        content:''
       },
       input3:'',
       select:''
@@ -125,7 +101,59 @@ export default {
       console.log(this.list)
     })
 
+  },
+  methods: {
+    search(){
+      if(this.input3 === ''){
+        this.reload()
+      }else{
+        notifySearch(this.input3).then(res => {
+          this.list = []
+          this.list.push(...res.data)
+          console.log(this.list)
+        })
+      }
+    },
+    reload() {
+      getNotifyList().then(res => {
+        this.list = []
+        this.list.push(...res.data)
+      })
+    },
+    handleClick(row) {
+      console.log(row);
+    },
+    changeShowAdd() {
+      this.showAdd = !this.showAdd
+    },
+    handleDelete(index, row) {
+      deleteNotify(row.id).then(res => {
+        this.$notify({
+          title: '成功',
+          message: '删除成功',
+          type: 'success'
+        });
+        this.reload()
+      })
+    },
+    onsubmit() {
+      this.form.time = new Date().toLocaleDateString()
+      addNotify(this.form).then(res => {
+        console.log(this.form)
+        console.log(res)
+        this.$notify({
+          title: '成功',
+          message: '插入成功',
+          type: 'success'
+        });
+        this.form = {
+          title: '',
+          content: '',
+        }
+      })
+    },
   }
+
 }
 </script>
 
