@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">红心社区后台管理平台</h3>
       </div>
 
       <el-form-item prop="username">
@@ -115,6 +115,8 @@ export default {
           }).then(res => {
             console.log(res)
             if(res.data.length > 0){
+              this.$store.state.name = res.data[0].name
+              this.$store.state.img = res.data[0].img
               this.$store.dispatch('user/login', this.loginForm).then(() => {
                 this.$router.push({ path: this.redirect || '/' })
                 this.loading = false

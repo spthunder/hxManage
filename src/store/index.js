@@ -8,6 +8,10 @@ import user from './modules/user'
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
+  state:{
+    name:'',
+    img:'',
+  },
   modules: {
     app,
     settings,
